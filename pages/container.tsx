@@ -57,7 +57,7 @@ const Container = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(
-        `Represent ${botReply} using the most suitable html tags`
+        `Represent ${botReply} using the most suitable html tags, I only want html part, not the other description.`
       ),
     });
 
