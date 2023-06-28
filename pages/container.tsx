@@ -22,9 +22,17 @@ const Container = () => {
     setIsLoading(true);
     let botReply2;
     await axios
-      .post("https://gpt-answer.vercel.app/api/getData", {
-        text: `Represent ${botanswer} using the most suitable html tag format, Only show html tags, not the other description.`,
-      })
+      .post(
+        "https://gpt-answer.vercel.app/api/getData",
+        {
+          text: `Convert ${botanswer} sentence using the most suitable html tag format, Only show html tags, not the other description.`,
+        },
+        {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+          },
+        }
+      )
       .then((res) => {
         if (res.data.success) {
           botReply2 = res.data.text.text;
