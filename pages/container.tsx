@@ -25,7 +25,7 @@ const Container = () => {
       .post(
         "https://gpt-answer.vercel.app/api/getData",
         {
-          text: `Convert ${botanswer} sentence using the most suitable html tag format, Only show html tags, not the other description.`,
+          text: `change ${botanswer} using the most suitable html tags, Only show html tags, not the other description.`,
         },
         {
           headers: {
