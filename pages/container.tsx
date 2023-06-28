@@ -2,6 +2,7 @@ import { DarkContext } from "@/context/DarkContext";
 import { useState, useEffect, useRef, useContext } from "react";
 import Image from "next/image";
 import TypeWriter from "./typeWriter";
+import axios from "axios";
 
 const Container = () => {
   const { darkMode, toggleDarkMode }: any = useContext(DarkContext);
@@ -17,77 +18,38 @@ const Container = () => {
   const [botChat, setBotChat] = useState<string[]>([]);
   const [htmlChat, setHtmlChat] = useState<string[]>([]);
 
+  const tagResponse = async (botanswer: string) => {
+    setIsLoading(true);
+    let botReply2;
+    await axios
+      .post("https://gpt-answer.vercel.app/api/getData", {
+        text: `Represent ${botanswer} using the most suitable html tag format, Only show html tags, not the other description.`,
+      })
+      .then((res) => {
+        if (res.data.success) {
+          botReply2 = res.data.text.text;
+          setHtmlChat([...htmlChat, botReply2]);
+        } else {
+          console.log("error");
+        }
+      });
+    setIsLoading(false);
+  };
   const botResponse = async () => {
     setIsLoading(true);
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(messageText),
-    });
-
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
-
-    // This data is a ReadableStream
-    const data = response.body;
-    if (!data) {
-      return;
-    }
-
-    const reader = data.getReader();
-    const decoder = new TextDecoder();
-    let done = false;
-
-    let botReply = "";
-
-    while (!done) {
-      const { value, done: doneReading } = await reader.read();
-      done = doneReading;
-      const botMessage = decoder.decode(value);
-      botReply += botMessage;
-    }
-    setBotChat([...botChat, eval(botReply)]);
-
-    const response1 = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(
-        `Represent ${botReply} using the most suitable html tags, I only want html part, not the other description.`
-      ),
-    });
-
-    if (!response1.ok) {
-      throw new Error(response1.statusText);
-    }
-
-    // This data is a ReadableStream
-    const data1 = response1.body;
-    if (!data1) {
-      return;
-    }
-    console.log(data1);
-    const reader1 = data1.getReader();
-    const decoder1 = new TextDecoder();
-    let done1 = false;
-
-    let botReply1 = "";
-
-    while (!done1) {
-      const { value, done: doneReading } = await reader1.read();
-      done1 = doneReading;
-      const botMessage1 = decoder1.decode(value);
-      botReply1 += botMessage1;
-    }
-    botReply1 = eval(botReply1);
-
-    setHtmlChat([...htmlChat, botReply1]);
-
-    setIsLoading(false);
+    await axios
+      .post("https://gpt-answer.vercel.app/api/getData", {
+        text: messageText,
+      })
+      .then((res) => {
+        if (res.data.success) {
+          const botReply1 = res.data.text.text;
+          setBotChat([...botChat, botReply1]);
+          tagResponse(botReply1);
+        } else {
+          console.log("error");
+        }
+      });
   };
 
   const handleScroll = (ref: any) => {
